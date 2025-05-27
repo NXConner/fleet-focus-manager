@@ -252,6 +252,115 @@ export type Database = {
           },
         ]
       }
+      employee_locations: {
+        Row: {
+          accuracy: number | null
+          employee_id: number
+          heading: number | null
+          id: string
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          speed: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          accuracy?: number | null
+          employee_id: number
+          heading?: number | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          speed?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          accuracy?: number | null
+          employee_id?: number
+          heading?: number | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          speed?: number | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_locations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_time_tracking: {
+        Row: {
+          break_end_time: string | null
+          break_start_time: string | null
+          clock_in_time: string | null
+          clock_out_time: string | null
+          created_at: string | null
+          employee_id: number
+          hourly_rate: number | null
+          id: string
+          location_data: Json | null
+          overtime_hours: number | null
+          overtime_rate: number | null
+          status: string | null
+          total_hours: number | null
+          total_pay: number | null
+          updated_at: string | null
+          work_date: string | null
+        }
+        Insert: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          clock_in_time?: string | null
+          clock_out_time?: string | null
+          created_at?: string | null
+          employee_id: number
+          hourly_rate?: number | null
+          id?: string
+          location_data?: Json | null
+          overtime_hours?: number | null
+          overtime_rate?: number | null
+          status?: string | null
+          total_hours?: number | null
+          total_pay?: number | null
+          updated_at?: string | null
+          work_date?: string | null
+        }
+        Update: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          clock_in_time?: string | null
+          clock_out_time?: string | null
+          created_at?: string | null
+          employee_id?: number
+          hourly_rate?: number | null
+          id?: string
+          location_data?: Json | null
+          overtime_hours?: number | null
+          overtime_rate?: number | null
+          status?: string | null
+          total_hours?: number | null
+          total_pay?: number | null
+          updated_at?: string | null
+          work_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_time_tracking_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           age: number | null
@@ -566,6 +675,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payroll: {
+        Row: {
+          created_at: string | null
+          employee_id: number
+          federal_tax: number | null
+          gross_pay: number | null
+          id: string
+          medicare: number | null
+          net_pay: number | null
+          other_deductions: number | null
+          overtime_hours: number | null
+          pay_date: string | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          regular_hours: number | null
+          social_security: number | null
+          state_tax: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id: number
+          federal_tax?: number | null
+          gross_pay?: number | null
+          id?: string
+          medicare?: number | null
+          net_pay?: number | null
+          other_deductions?: number | null
+          overtime_hours?: number | null
+          pay_date?: string | null
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          regular_hours?: number | null
+          social_security?: number | null
+          state_tax?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: number
+          federal_tax?: number | null
+          gross_pay?: number | null
+          id?: string
+          medicare?: number | null
+          net_pay?: number | null
+          other_deductions?: number | null
+          overtime_hours?: number | null
+          pay_date?: string | null
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          regular_hours?: number | null
+          social_security?: number | null
+          state_tax?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipts: {
+        Row: {
+          amount: number | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          employee_id: number | null
+          extracted_data: Json | null
+          id: string
+          is_processed: boolean | null
+          receipt_date: string | null
+          receipt_image_url: string | null
+          tax_amount: number | null
+          updated_at: string | null
+          vendor_name: string | null
+        }
+        Insert: {
+          amount?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          employee_id?: number | null
+          extracted_data?: Json | null
+          id?: string
+          is_processed?: boolean | null
+          receipt_date?: string | null
+          receipt_image_url?: string | null
+          tax_amount?: number | null
+          updated_at?: string | null
+          vendor_name?: string | null
+        }
+        Update: {
+          amount?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          employee_id?: number | null
+          extracted_data?: Json | null
+          id?: string
+          is_processed?: boolean | null
+          receipt_date?: string | null
+          receipt_image_url?: string | null
+          tax_amount?: number | null
+          updated_at?: string | null
+          vendor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_records: {
+        Row: {
+          amount_owed: number | null
+          amount_paid: number | null
+          created_at: string | null
+          due_date: string | null
+          filed_date: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          tax_type: string
+          tax_year: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_owed?: number | null
+          amount_paid?: number | null
+          created_at?: string | null
+          due_date?: string | null
+          filed_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          tax_type: string
+          tax_year: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_owed?: number | null
+          amount_paid?: number | null
+          created_at?: string | null
+          due_date?: string | null
+          filed_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          tax_type?: string
+          tax_year?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       vendors: {
         Row: {

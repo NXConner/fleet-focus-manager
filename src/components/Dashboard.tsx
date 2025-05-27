@@ -8,6 +8,11 @@ import EquipmentManagement from "./EquipmentManagement";
 import InsuranceManagement from "./InsuranceManagement";
 import { MaintenanceChecklist } from "./MaintenanceChecklist";
 import AccountingDashboard from "./AccountingDashboard";
+import ReceiptManagement from "./ReceiptManagement";
+import TaxManagement from "./TaxManagement";
+import TimeTracker from "./TimeTracker";
+import EmployeeMap from "./EmployeeMap";
+import PayrollManagement from "./PayrollManagement";
 import { 
   Users, 
   Car, 
@@ -19,7 +24,11 @@ import {
   DollarSign,
   FileText,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  Receipt,
+  Clock,
+  MapPin,
+  Briefcase
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -128,7 +137,7 @@ const Dashboard = () => {
         </div>
 
         <Tabs defaultValue="employees" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9">
             <TabsTrigger value="employees" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Employees
@@ -153,6 +162,18 @@ const Dashboard = () => {
               <Calculator className="h-4 w-4" />
               Accounting
             </TabsTrigger>
+            <TabsTrigger value="receipts" className="flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              Receipts
+            </TabsTrigger>
+            <TabsTrigger value="timetracker" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Time Tracker
+            </TabsTrigger>
+            <TabsTrigger value="gps" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              GPS Tracking
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="employees">
@@ -176,7 +197,37 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="accounting">
-            <AccountingDashboard />
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="taxes">Tax Management</TabsTrigger>
+                <TabsTrigger value="payroll">Payroll</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview">
+                <AccountingDashboard />
+              </TabsContent>
+              
+              <TabsContent value="taxes">
+                <TaxManagement />
+              </TabsContent>
+              
+              <TabsContent value="payroll">
+                <PayrollManagement />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="receipts">
+            <ReceiptManagement />
+          </TabsContent>
+
+          <TabsContent value="timetracker">
+            <TimeTracker />
+          </TabsContent>
+
+          <TabsContent value="gps">
+            <EmployeeMap />
           </TabsContent>
         </Tabs>
       </div>
