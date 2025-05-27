@@ -13,7 +13,10 @@ import Dashboard from "@/components/Dashboard";
 import { Truck, Users, Calendar, FileText, Shield, Sparkles } from "lucide-react";
 
 const Index = () => {
+  console.log("Index component rendering");
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  console.log("Active tab:", activeTab);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 transition-all duration-500">
