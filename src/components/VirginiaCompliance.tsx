@@ -1,25 +1,13 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Shield, 
-  CheckCircle, 
-  AlertTriangle, 
-  Calendar,
-  FileText,
-  HardHat,
-  Car,
-  Scale,
-  Building,
-  Clock,
-  Download,
-  ExternalLink
-} from "lucide-react";
+import { Download } from "lucide-react";
+import ComplianceOverview from "./compliance/ComplianceOverview";
+import ComplianceAlerts from "./compliance/ComplianceAlerts";
+import OSHARequirements from "./compliance/OSHARequirements";
 
 const VirginiaCompliance = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -170,109 +158,8 @@ const VirginiaCompliance = () => {
         </div>
       </div>
 
-      {/* Compliance Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-orange-200 bg-orange-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <HardHat className="w-5 h-5 text-orange-600" />
-              OSHA Virginia
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Compliance:</span>
-                <span className="font-medium">92%</span>
-              </div>
-              <Progress value={92} className="h-2" />
-              <div className="text-xs text-orange-700">
-                1 training due within 30 days
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Car className="w-5 h-5 text-blue-600" />
-              VDOT
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Certifications:</span>
-                <span className="font-medium">2/3 Current</span>
-              </div>
-              <Progress value={67} className="h-2" />
-              <div className="text-xs text-blue-700">
-                QA Certification renewal required
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Scale className="w-5 h-5 text-green-600" />
-              Board of Contractors
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">License Status:</span>
-                <span className="font-medium">Active</span>
-              </div>
-              <Progress value={95} className="h-2" />
-              <div className="text-xs text-green-700">
-                All licenses current & valid
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-purple-200 bg-purple-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Building className="w-5 h-5 text-purple-600" />
-              VA DMV
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Fleet Status:</span>
-                <span className="font-medium">11/12 Current</span>
-              </div>
-              <Progress value={91} className="h-2" />
-              <div className="text-xs text-purple-700">
-                1 inspection due this month
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Alerts Section */}
-      <div className="space-y-4">
-        <Alert className="border-orange-200 bg-orange-50">
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
-          <AlertDescription className="text-orange-800">
-            <strong>Action Required:</strong> PPE Training for 2 employees expires in 15 days. Schedule renewal training.
-          </AlertDescription>
-        </Alert>
-        
-        <Alert className="border-red-200 bg-red-50">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
-            <strong>Urgent:</strong> VDOT Quality Assurance Certification expired. Contact VDOT for renewal process.
-          </AlertDescription>
-        </Alert>
-      </div>
+      <ComplianceOverview />
+      <ComplianceAlerts />
 
       {/* Detailed Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -348,37 +235,7 @@ const VirginiaCompliance = () => {
         </TabsContent>
 
         <TabsContent value="osha">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HardHat className="w-5 h-5" />
-                OSHA Virginia Safety Requirements
-              </CardTitle>
-              <CardDescription>
-                Occupational Safety and Health Administration requirements for Virginia construction
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {oshaRequirements.map((req) => (
-                  <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{req.requirement}</h4>
-                      <p className="text-sm text-gray-600">Expires: {req.expiryDate}</p>
-                      <p className="text-sm text-gray-600">{req.employees}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={req.color}>{req.status}</Badge>
-                      <Button variant="outline" size="sm">
-                        <FileText className="w-3 h-3 mr-1" />
-                        View
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <OSHARequirements />
         </TabsContent>
 
         <TabsContent value="vdot">

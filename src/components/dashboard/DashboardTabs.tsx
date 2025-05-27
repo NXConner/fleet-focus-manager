@@ -13,6 +13,7 @@ import TimeTracker from "../TimeTracker";
 import EmployeeMap from "../EmployeeMap";
 import PayrollManagement from "../PayrollManagement";
 import VirginiaCompliance from "../VirginiaCompliance";
+import LineStripping from "../LineStripping";
 import { 
   Users, 
   Car, 
@@ -23,13 +24,14 @@ import {
   Receipt,
   Clock,
   MapPin,
-  Scale
+  Scale,
+  PaintBucket
 } from "lucide-react";
 
 const DashboardTabs = () => {
   return (
     <Tabs defaultValue="employees" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10">
+      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-11">
         <TabsTrigger value="employees" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           Employees
@@ -69,6 +71,10 @@ const DashboardTabs = () => {
         <TabsTrigger value="compliance" className="flex items-center gap-2">
           <Scale className="h-4 w-4" />
           VA Compliance
+        </TabsTrigger>
+        <TabsTrigger value="linestripping" className="flex items-center gap-2">
+          <PaintBucket className="h-4 w-4" />
+          Line Stripping
         </TabsTrigger>
       </TabsList>
 
@@ -128,6 +134,10 @@ const DashboardTabs = () => {
 
       <TabsContent value="compliance">
         <VirginiaCompliance />
+      </TabsContent>
+
+      <TabsContent value="linestripping">
+        <LineStripping />
       </TabsContent>
     </Tabs>
   );
