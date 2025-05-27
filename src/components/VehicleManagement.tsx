@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,8 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Calendar, FileText, Camera, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Truck, Calendar, FileText, Camera, Plus, Wrench, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MaintenanceChecklist } from "@/components/MaintenanceChecklist";
 
 const VehicleManagement = () => {
   const { toast } = useToast();
@@ -32,11 +33,13 @@ const VehicleManagement = () => {
       oilType: "5W-30",
       oilAmount: "5 quarts",
       plugSize: "14mm",
-      tireSize: "P235/75R15"
+      tireSize: "P235/75R15",
+      maintenanceScore: 85
     }
   ]);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     year: "",
     make: "",
@@ -62,7 +65,8 @@ const VehicleManagement = () => {
     e.preventDefault();
     const newVehicle = {
       id: vehicles.length + 1,
-      ...formData
+      ...formData,
+      maintenanceScore: 100
     };
     setVehicles([...vehicles, newVehicle]);
     setFormData({
@@ -92,24 +96,37 @@ const VehicleManagement = () => {
     });
   };
 
+  const getMaintenanceScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600 dark:text-green-400";
+    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Vehicle Management</h2>
-          <p className="text-slate-600">Manage your fleet vehicles and maintenance records</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 transition-colors duration-300">
+            Vehicle Management
+          </h2>
+          <p className="text-slate-600 dark:text-slate-300 transition-colors duration-300">
+            Manage your fleet vehicles and maintenance records
+          </p>
         </div>
-        <Button onClick={() => setShowAddForm(!showAddForm)} className="bg-blue-600 hover:bg-blue-700">
+        <Button 
+          onClick={() => setShowAddForm(!showAddForm)} 
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-300 hover:scale-105 shadow-lg"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Vehicle
         </Button>
       </div>
 
       {showAddForm && (
-        <Card className="border-blue-200">
+        <Card className="border-blue-200 dark:border-blue-800 shadow-xl animate-scale-in">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Truck className="w-5 h-5 text-blue-600" />
+              <Truck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               Add New Vehicle
             </CardTitle>
             <CardDescription>Enter comprehensive vehicle information and maintenance details</CardDescription>
@@ -332,10 +349,10 @@ const VehicleManagement = () => {
                 </TabsContent>
 
                 <TabsContent value="photos" className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center transition-colors duration-300 hover:border-blue-400">
                     <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-2">Upload vehicle photos</p>
-                    <p className="text-sm text-gray-500 mb-4">Drag and drop images or click to browse</p>
+                    <p className="text-gray-600 dark:text-gray-300 mb-2">Upload vehicle photos</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Drag and drop images or click to browse</p>
                     <Button type="button" variant="outline">
                       Choose Files
                     </Button>
@@ -344,7 +361,7 @@ const VehicleManagement = () => {
               </Tabs>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-105">
                   Add Vehicle
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
@@ -358,11 +375,11 @@ const VehicleManagement = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {vehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="hover:shadow-lg transition-shadow">
+          <Card key={vehicle.id} className="hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/50">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-lg text-slate-800 dark:text-slate-100">
                     {vehicle.year} {vehicle.make} {vehicle.model}
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-1">
@@ -373,8 +390,14 @@ const VehicleManagement = () => {
                       {vehicle.engine}
                     </Badge>
                   </CardDescription>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs text-muted-foreground">Maintenance Score:</span>
+                    <Badge className={`text-xs ${getMaintenanceScoreColor(vehicle.maintenanceScore)}`}>
+                      {vehicle.maintenanceScore}%
+                    </Badge>
+                  </div>
                 </div>
-                <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center transition-colors duration-300">
                   <Camera className="w-6 h-6 text-gray-400" />
                 </div>
               </div>
@@ -382,50 +405,71 @@ const VehicleManagement = () => {
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-600">VIN:</span>
+                  <span className="text-gray-600 dark:text-gray-400">VIN:</span>
                   <p className="font-mono text-xs">{vehicle.vin}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600">License:</span>
+                  <span className="text-gray-600 dark:text-gray-400">License:</span>
                   <p className="font-medium">{vehicle.licensePlate}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600">Registration:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Registration:</span>
                   <p className="font-medium">{vehicle.registration}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600">Tire Size:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Tire Size:</span>
                   <p className="font-medium">{vehicle.tireSize}</p>
                 </div>
               </div>
               
               <div className="border-t pt-3">
-                <p className="text-sm font-medium text-gray-700 mb-2">Oil Change Info</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Oil Change Info</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <span className="text-gray-500">Last:</span> {vehicle.lastOilChange} mi
+                    <span className="text-gray-500 dark:text-gray-400">Last:</span> {vehicle.lastOilChange} mi
                   </div>
                   <div>
-                    <span className="text-gray-500">Next:</span> {vehicle.nextOilChange} mi
+                    <span className="text-gray-500 dark:text-gray-400">Next:</span> {vehicle.nextOilChange} mi
                   </div>
                   <div>
-                    <span className="text-gray-500">Type:</span> {vehicle.oilType}
+                    <span className="text-gray-500 dark:text-gray-400">Type:</span> {vehicle.oilType}
                   </div>
                   <div>
-                    <span className="text-gray-500">Amount:</span> {vehicle.oilAmount}
+                    <span className="text-gray-500 dark:text-gray-400">Amount:</span> {vehicle.oilAmount}
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" className="flex-1">
+                <Button size="sm" variant="outline" className="flex-1 transition-all duration-200 hover:scale-105">
                   <FileText className="w-3 h-3 mr-1" />
                   Details
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  Schedule
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 transition-all duration-200 hover:scale-105"
+                      onClick={() => setSelectedVehicle(vehicle.id)}
+                    >
+                      <Wrench className="w-3 h-3 mr-1" />
+                      Maintenance
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Wrench className="w-5 h-5" />
+                        Maintenance Checklist - {vehicle.year} {vehicle.make} {vehicle.model}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Comprehensive maintenance tracking and records
+                      </DialogDescription>
+                    </DialogHeader>
+                    {selectedVehicle && <MaintenanceChecklist vehicleId={selectedVehicle} />}
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
