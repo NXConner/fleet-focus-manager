@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Upload, Download, FileText, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-interface Document {
+interface DocumentType {
   id: string;
   document_type: string;
   file_name: string;
@@ -19,7 +20,7 @@ interface Document {
 
 interface DocumentUploadProps {
   employeeId: number;
-  documents: Document[];
+  documents: DocumentType[];
   onDocumentUploaded: () => void;
 }
 
@@ -80,7 +81,7 @@ const DocumentUpload = ({ employeeId, documents, onDocumentUploaded }: DocumentU
     }
   };
 
-  const handleDownload = async (document: Document) => {
+  const handleDownload = async (document: DocumentType) => {
     try {
       const { data, error } = await supabase.storage
         .from('employee-documents')
@@ -89,10 +90,10 @@ const DocumentUpload = ({ employeeId, documents, onDocumentUploaded }: DocumentU
       if (error) throw error;
 
       const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.file_name;
-      a.click();
+      const link = window.document.createElement('a');
+      link.href = url;
+      link.download = document.file_name;
+      link.click();
       URL.revokeObjectURL(url);
 
       toast({
@@ -109,7 +110,7 @@ const DocumentUpload = ({ employeeId, documents, onDocumentUploaded }: DocumentU
     }
   };
 
-  const handleDelete = async (document: Document) => {
+  const handleDelete = async (document: DocumentType) => {
     try {
       // Delete from storage
       const { error: storageError } = await supabase.storage
