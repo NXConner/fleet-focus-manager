@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, CheckCircle, AlertTriangle, Wrench, Plus } from 'lucide-react';
+import { Calendar, CheckCircle, AlertTriangle, Wrench, Plus, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface MaintenanceItem {
