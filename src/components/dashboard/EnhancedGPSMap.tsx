@@ -1,12 +1,14 @@
-
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Play, Pause, RotateCcw, Clock, Gauge } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MapPin, Play, Pause, RotateCcw, Clock, Gauge, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import MapSourceSelector, { MAP_SOURCES, MapSource } from './MapSourceSelector';
+import MultiProviderMap from './MultiProviderMap';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface EmployeeLocation {
   id: string;
@@ -35,15 +37,17 @@ interface TrackingHistory {
 }
 
 const EnhancedGPSMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
   const [locations, setLocations] = useState<EmployeeLocation[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<number | null>(null);
   const [trackingHistory, setTrackingHistory] = useState<TrackingHistory[]>([]);
   const [isPlayingBack, setIsPlayingBack] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState(0);
   const [mapboxToken, setMapboxToken] = useState('');
-  const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState('');
+  const [selectedMapSource, setSelectedMapSource] = useState('esri-satellite');
+  const [showApiSettings, setShowApiSettings] = useState(false);
+  const [currentMap, setCurrentMap] = useState<any>(null);
+  const markersRef = useRef<{ [key: number]: any }>({});
 
   // Patrick County, Virginia coordinates
   const PATRICK_COUNTY = {
@@ -51,38 +55,7 @@ const EnhancedGPSMap = () => {
     zoom: 11
   };
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    // For now, we'll use a placeholder for the Mapbox token
-    // In a real implementation, this should come from environment variables or user input
-    const token = 'pk.your_mapbox_token_here';
-    setMapboxToken(token);
-
-    if (!token || token === 'pk.your_mapbox_token_here') {
-      // Show message to user about needing Mapbox token
-      return;
-    }
-
-    mapboxgl.accessToken = token;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-v9',
-      center: PATRICK_COUNTY.center,
-      zoom: PATRICK_COUNTY.zoom,
-      pitch: 0,
-      bearing: 0
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
-  }, [mapboxToken]);
+  const currentMapSource = MAP_SOURCES.find(source => source.id === selectedMapSource) || MAP_SOURCES[0];
 
   useEffect(() => {
     fetchActiveLocations();
@@ -104,51 +77,11 @@ const EnhancedGPSMap = () => {
   }, []);
 
   useEffect(() => {
-    if (!map.current || !locations.length) return;
+    if (!locations.length) return;
 
-    // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    markersRef.current = {};
-
-    // Add markers for active employees
-    locations.forEach(location => {
-      const el = document.createElement('div');
-      el.className = 'employee-marker';
-      el.style.cssText = `
-        background-color: #10b981;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: 2px solid white;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      `;
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([location.longitude, location.latitude])
-        .addTo(map.current!);
-
-      // Add popup with employee info
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`
-          <div class="p-2">
-            <h3 class="font-bold">${location.employee.first_name} ${location.employee.last_name}</h3>
-            <p class="text-sm">${location.employee.position}</p>
-            <p class="text-xs">Speed: ${location.speed.toFixed(1)} mph</p>
-            <p class="text-xs">Updated: ${new Date(location.timestamp).toLocaleTimeString()}</p>
-          </div>
-        `);
-
-      marker.setPopup(popup);
-
-      // Click handler for detailed view
-      el.addEventListener('click', () => {
-        setSelectedEmployee(location.employee_id);
-        fetchEmployeeHistory(location.employee_id);
-      });
-
-      markersRef.current[location.employee_id] = marker;
-    });
+    if (currentMap) {
+      addMarkersToMap(currentMap);
+    }
   }, [locations]);
 
   const fetchActiveLocations = async () => {
@@ -205,7 +138,7 @@ const EnhancedGPSMap = () => {
   };
 
   const startPlayback = () => {
-    if (!trackingHistory.length || !map.current) return;
+    if (!trackingHistory.length || !currentMap) return;
     
     setIsPlayingBack(true);
     setPlaybackIndex(0);
@@ -219,11 +152,19 @@ const EnhancedGPSMap = () => {
         }
         
         const currentPoint = trackingHistory[prev + 1];
-        map.current?.flyTo({
-          center: [currentPoint.longitude, currentPoint.latitude],
-          zoom: 16,
-          duration: 1000
-        });
+
+        if (currentMapSource.type === 'mapbox') {
+          currentMap?.flyTo({
+            center: [currentPoint.longitude, currentPoint.latitude],
+            zoom: 16,
+            duration: 1000
+          });
+        } else if (currentMapSource.type === 'google') {
+          currentMap.setCenter({ lat: currentPoint.latitude, lng: currentPoint.longitude });
+          currentMap.setZoom(16);
+        } else if (currentMapSource.type === 'leaflet') {
+          currentMap.setView([currentPoint.latitude, currentPoint.longitude], 16);
+        }
         
         return prev + 1;
       });
@@ -236,12 +177,19 @@ const EnhancedGPSMap = () => {
     setPlaybackIndex(0);
     setIsPlayingBack(false);
     
-    if (map.current) {
-      map.current.flyTo({
-        center: PATRICK_COUNTY.center,
-        zoom: PATRICK_COUNTY.zoom,
-        duration: 2000
-      });
+    if (currentMap) {
+      if (currentMapSource.type === 'mapbox') {
+        currentMap.flyTo({
+          center: PATRICK_COUNTY.center,
+          zoom: PATRICK_COUNTY.zoom,
+          duration: 2000
+        });
+      } else if (currentMapSource.type === 'google') {
+        currentMap.setCenter({ lat: PATRICK_COUNTY.center[1], lng: PATRICK_COUNTY.center[0] });
+        currentMap.setZoom(PATRICK_COUNTY.zoom);
+      } else if (currentMapSource.type === 'leaflet') {
+        currentMap.setView([PATRICK_COUNTY.center[1], PATRICK_COUNTY.center[0]], PATRICK_COUNTY.zoom);
+      }
     }
   };
 
@@ -273,35 +221,131 @@ const EnhancedGPSMap = () => {
     return R * c;
   };
 
-  if (!mapboxToken || mapboxToken === 'pk.your_mapbox_token_here') {
-    return (
-      <Card className="col-span-1 lg:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
-            Real-Time Employee GPS Tracking
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 text-center">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-medium text-yellow-800 mb-2">Mapbox Token Required</h3>
-            <p className="text-sm text-yellow-700 mb-4">
-              To enable the enhanced GPS map with satellite view, please add your Mapbox public token.
-            </p>
-            <input 
-              type="text" 
-              placeholder="Enter your Mapbox public token"
-              className="w-full p-2 border rounded mb-2"
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <p className="text-xs text-yellow-600">
-              Get your token at <a href="https://mapbox.com/" target="_blank" className="underline">mapbox.com</a>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const handleMapLoad = (map: any) => {
+    setCurrentMap(map);
+    if (locations.length > 0) {
+      addMarkersToMap(map);
+    }
+  };
+
+  const addMarkersToMap = (map: any) => {
+    if (!map || !locations.length) return;
+
+    // Clear existing markers
+    Object.values(markersRef.current).forEach(marker => {
+      if (marker.remove) marker.remove();
+      if (marker.setMap) marker.setMap(null);
+    });
+    markersRef.current = {};
+
+    locations.forEach(location => {
+      if (currentMapSource.type === 'mapbox') {
+        addMapboxMarker(map, location);
+      } else if (currentMapSource.type === 'google') {
+        addGoogleMarker(map, location);
+      } else if (currentMapSource.type === 'leaflet') {
+        addLeafletMarker(map, location);
+      }
+    });
+  };
+
+  const addMapboxMarker = (map: any, location: EmployeeLocation) => {
+    const el = document.createElement('div');
+    el.className = 'employee-marker';
+    el.style.cssText = `
+      background-color: #10b981;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid white;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    `;
+
+    const marker = new window.mapboxgl.Marker(el)
+      .setLngLat([location.longitude, location.latitude])
+      .addTo(map);
+
+    const popup = new window.mapboxgl.Popup({ offset: 25 })
+      .setHTML(getMarkerPopupContent(location));
+
+    marker.setPopup(popup);
+    el.addEventListener('click', () => handleMarkerClick(location));
+    markersRef.current[location.employee_id] = marker;
+  };
+
+  const addGoogleMarker = (map: any, location: EmployeeLocation) => {
+    const marker = new window.google.maps.Marker({
+      position: { lat: location.latitude, lng: location.longitude },
+      map: map,
+      title: `${location.employee.first_name} ${location.employee.last_name}`,
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: '#10b981',
+        fillOpacity: 1,
+        strokeColor: 'white',
+        strokeWeight: 2,
+      }
+    });
+
+    const infoWindow = new window.google.maps.InfoWindow({
+      content: getMarkerPopupContent(location)
+    });
+
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+      handleMarkerClick(location);
+    });
+
+    markersRef.current[location.employee_id] = marker;
+  };
+
+  const addLeafletMarker = (map: any, location: EmployeeLocation) => {
+    const marker = window.L.circleMarker([location.latitude, location.longitude], {
+      radius: 10,
+      fillColor: '#10b981',
+      fillOpacity: 1,
+      color: 'white',
+      weight: 2
+    }).addTo(map);
+
+    marker.bindPopup(getMarkerPopupContent(location));
+    marker.on('click', () => handleMarkerClick(location));
+    markersRef.current[location.employee_id] = marker;
+  };
+
+  const getMarkerPopupContent = (location: EmployeeLocation) => {
+    return `
+      <div class="p-2">
+        <h3 class="font-bold">${location.employee.first_name} ${location.employee.last_name}</h3>
+        <p class="text-sm">${location.employee.position}</p>
+        <p class="text-xs">Speed: ${location.speed.toFixed(1)} mph</p>
+        <p class="text-xs">Updated: ${new Date(location.timestamp).toLocaleTimeString()}</p>
+      </div>
+    `;
+  };
+
+  const handleMarkerClick = (location: EmployeeLocation) => {
+    setSelectedEmployee(location.employee_id);
+    fetchEmployeeHistory(location.employee_id);
+  };
+
+  useEffect(() => {
+    if (currentMap && locations.length > 0) {
+      addMarkersToMap(currentMap);
+    }
+  }, [locations, currentMap, currentMapSource]);
+
+  const getAvailableMapSources = () => {
+    return MAP_SOURCES.filter(source => {
+      if (source.requiresApiKey) {
+        if (source.type === 'mapbox') return mapboxToken && mapboxToken !== 'pk.your_mapbox_token_here';
+        if (source.type === 'google') return googleMapsApiKey;
+      }
+      return true;
+    });
+  };
 
   return (
     <Card className="col-span-1 lg:col-span-2">
@@ -311,20 +355,70 @@ const EnhancedGPSMap = () => {
             <MapPin className="w-5 h-5" />
             GPS Tracking - Patrick County, VA
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <MapSourceSelector 
+              selectedSource={selectedMapSource}
+              onSourceChange={setSelectedMapSource}
+              availableSources={getAvailableMapSources()}
+            />
             <Badge variant="outline">
               Active: {locations.length}
             </Badge>
+            <Button size="sm" variant="outline" onClick={() => setShowApiSettings(!showApiSettings)}>
+              <Settings className="w-3 h-3 mr-1" />
+              Settings
+            </Button>
             <Button size="sm" variant="outline" onClick={resetView}>
               <RotateCcw className="w-3 h-3 mr-1" />
               Reset View
             </Button>
           </div>
         </div>
+
+        <Collapsible open={showApiSettings} onOpenChange={setShowApiSettings}>
+          <CollapsibleContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <Label htmlFor="mapbox-token">Mapbox Public Token</Label>
+                <Input 
+                  id="mapbox-token"
+                  type="text" 
+                  placeholder="pk.your_mapbox_token_here"
+                  value={mapboxToken}
+                  onChange={(e) => setMapboxToken(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Get your token at <a href="https://mapbox.com/" target="_blank" className="underline">mapbox.com</a>
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="google-api-key">Google Maps API Key</Label>
+                <Input 
+                  id="google-api-key"
+                  type="text" 
+                  placeholder="Your Google Maps API Key"
+                  value={googleMapsApiKey}
+                  onChange={(e) => setGoogleMapsApiKey(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Get your key at <a href="https://developers.google.com/maps" target="_blank" className="underline">Google Maps Platform</a>
+                </p>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardHeader>
       <CardContent className="p-0">
         <div className="h-96 relative">
-          <div ref={mapContainer} className="w-full h-full" />
+          <MultiProviderMap
+            mapSource={currentMapSource}
+            center={PATRICK_COUNTY.center}
+            zoom={PATRICK_COUNTY.zoom}
+            onMapLoad={handleMapLoad}
+            mapboxToken={mapboxToken}
+            googleMapsApiKey={googleMapsApiKey}
+            className="w-full h-full"
+          />
           
           {selectedEmployeeData && (
             <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-4 max-w-sm">
