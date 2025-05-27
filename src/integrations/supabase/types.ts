@@ -9,7 +9,110 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      employee_documents: {
+        Row: {
+          document_type: string
+          employee_id: number
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          uploaded_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          document_type: string
+          employee_id: number
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          document_type?: string
+          employee_id?: number
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_documents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          age: number | null
+          birthday: string | null
+          contract_signed: boolean | null
+          created_at: string | null
+          email: string
+          emergency_contact: string | null
+          first_name: string
+          handbook_received: boolean | null
+          hire_date: string | null
+          id: number
+          last_name: string
+          license_number: string | null
+          notes: string | null
+          phone: string | null
+          position: string | null
+          updated_at: string | null
+          w2_filed: boolean | null
+        }
+        Insert: {
+          age?: number | null
+          birthday?: string | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          email: string
+          emergency_contact?: string | null
+          first_name: string
+          handbook_received?: boolean | null
+          hire_date?: string | null
+          id?: number
+          last_name: string
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+          w2_filed?: boolean | null
+        }
+        Update: {
+          age?: number | null
+          birthday?: string | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          email?: string
+          emergency_contact?: string | null
+          first_name?: string
+          handbook_received?: boolean | null
+          hire_date?: string | null
+          id?: number
+          last_name?: string
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+          w2_filed?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
