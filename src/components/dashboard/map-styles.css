@@ -1,0 +1,17 @@
+
+.employee-marker {
+  transition: all 0.3s ease;
+}
+
+.employee-marker:hover {
+  transform: scale(1.2);
+}
+
+.mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 8px;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: white;
+}
