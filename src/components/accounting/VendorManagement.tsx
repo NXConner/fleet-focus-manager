@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Search, Mail, Phone, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import SampleVendorData from "./SampleVendorData";
 
 interface Vendor {
   id: string;
@@ -257,6 +257,10 @@ const VendorManagement = () => {
         </Dialog>
       </div>
 
+      {vendors.length === 0 && (
+        <SampleVendorData />
+      )}
+
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -316,7 +320,7 @@ const VendorManagement = () => {
         ))}
       </div>
 
-      {filteredVendors.length === 0 && (
+      {filteredVendors.length === 0 && vendors.length > 0 && (
         <Card>
           <CardContent className="text-center py-8">
             <p className="text-muted-foreground">No vendors found</p>
