@@ -1,578 +1,494 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Shield, 
-  FileText, 
-  AlertTriangle, 
   CheckCircle, 
+  AlertTriangle, 
   Calendar,
+  FileText,
   HardHat,
   Car,
   Scale,
   Building,
-  Phone,
-  Globe,
   Clock,
-  Users,
-  Wrench
+  Download,
+  ExternalLink
 } from "lucide-react";
 
 const VirginiaCompliance = () => {
-  const [selectedCertification, setSelectedCertification] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // OSHA Virginia Requirements
+  const oshaRequirements = [
+    {
+      id: 1,
+      requirement: "OSHA 10-Hour Construction Safety Training",
+      status: "Current",
+      expiryDate: "2025-03-15",
+      employees: "16/16 certified",
+      color: "bg-green-100 text-green-800"
+    },
+    {
+      id: 2,
+      requirement: "Hazard Communication Standard (HazCom)",
+      status: "Current",
+      expiryDate: "2025-01-20",
+      employees: "16/16 trained",
+      color: "bg-green-100 text-green-800"
+    },
+    {
+      id: 3,
+      requirement: "Personal Protective Equipment (PPE) Training",
+      status: "Due Soon",
+      expiryDate: "2024-06-10",
+      employees: "14/16 current",
+      color: "bg-orange-100 text-orange-800"
+    },
+    {
+      id: 4,
+      requirement: "Fall Protection Training",
+      status: "Current",
+      expiryDate: "2025-02-28",
+      employees: "12/16 certified",
+      color: "bg-green-100 text-green-800"
+    }
+  ];
+
+  // VDOT Requirements
+  const vdotRequirements = [
+    {
+      id: 1,
+      requirement: "VDOT Prequalification Status",
+      status: "Active",
+      expiryDate: "2024-12-31",
+      certNumber: "PQ-2024-ABC123",
+      color: "bg-blue-100 text-blue-800"
+    },
+    {
+      id: 2,
+      requirement: "Work Zone Traffic Control Certification",
+      status: "Current",
+      expiryDate: "2025-04-15",
+      certNumber: "WZ-2024-DEF456",
+      color: "bg-blue-100 text-blue-800"
+    },
+    {
+      id: 3,
+      requirement: "Quality Assurance Certification",
+      status: "Renewal Required",
+      expiryDate: "2024-07-30",
+      certNumber: "QA-2023-GHI789",
+      color: "bg-red-100 text-red-800"
+    }
+  ];
+
+  // Virginia Board of Contractors
+  const contractorRequirements = [
+    {
+      id: 1,
+      requirement: "Class A Contractor License",
+      status: "Active",
+      licenseNumber: "2705123456",
+      expiryDate: "2025-08-31",
+      specialty: "Highway/Heavy Construction",
+      color: "bg-green-100 text-green-800"
+    },
+    {
+      id: 2,
+      requirement: "PAV Specialty License",
+      status: "Active",
+      licenseNumber: "PAV-2024-789",
+      expiryDate: "2025-06-30",
+      specialty: "Pavement Specialty",
+      color: "bg-green-100 text-green-800"
+    },
+    {
+      id: 3,
+      requirement: "Continuing Education Requirements",
+      status: "In Progress",
+      hours: "6/8 hours completed",
+      expiryDate: "2024-08-31",
+      color: "bg-orange-100 text-orange-800"
+    }
+  ];
+
+  // DMV Requirements
+  const dmvRequirements = [
+    {
+      id: 1,
+      vehicle: "2019 Ford F-550 (Fleet #001)",
+      inspection: "Current",
+      expiryDate: "2024-09-15",
+      registration: "Current",
+      regExpiry: "2024-12-31",
+      color: "bg-green-100 text-green-800"
+    },
+    {
+      id: 2,
+      vehicle: "2020 Freightliner (Fleet #002)",
+      inspection: "Due Soon",
+      expiryDate: "2024-06-20",
+      registration: "Current",
+      regExpiry: "2025-01-15",
+      color: "bg-orange-100 text-orange-800"
+    },
+    {
+      id: 3,
+      vehicle: "2018 Equipment Trailer (Fleet #003)",
+      inspection: "Current",
+      expiryDate: "2024-11-30",
+      registration: "Current",
+      regExpiry: "2024-10-31",
+      color: "bg-green-100 text-green-800"
+    }
+  ];
+
+  const complianceScore = 87;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Virginia State Compliance Dashboard</h2>
-          <p className="text-muted-foreground">OSHA, VDOT, DMV, and Board of Contractors compliance tracking</p>
+          <h2 className="text-2xl font-bold text-slate-800">Virginia Compliance Dashboard</h2>
+          <p className="text-slate-600">OSHA, VDOT, Board of Contractors & DMV Requirements</p>
         </div>
-        <Badge variant="outline" className="text-lg px-3 py-1">
-          <Shield className="w-4 h-4 mr-1" />
-          Fully Compliant
-        </Badge>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="text-2xl font-bold text-blue-600">{complianceScore}%</div>
+            <div className="text-sm text-gray-600">Compliance Score</div>
+          </div>
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      <Tabs defaultValue="osha" className="space-y-4">
+      {/* Compliance Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <HardHat className="w-5 h-5 text-orange-600" />
+              OSHA Virginia
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Compliance:</span>
+                <span className="font-medium">92%</span>
+              </div>
+              <Progress value={92} className="h-2" />
+              <div className="text-xs text-orange-700">
+                1 training due within 30 days
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Car className="w-5 h-5 text-blue-600" />
+              VDOT
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Certifications:</span>
+                <span className="font-medium">2/3 Current</span>
+              </div>
+              <Progress value={67} className="h-2" />
+              <div className="text-xs text-blue-700">
+                QA Certification renewal required
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Scale className="w-5 h-5 text-green-600" />
+              Board of Contractors
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">License Status:</span>
+                <span className="font-medium">Active</span>
+              </div>
+              <Progress value={95} className="h-2" />
+              <div className="text-xs text-green-700">
+                All licenses current & valid
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-purple-200 bg-purple-50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Building className="w-5 h-5 text-purple-600" />
+              VA DMV
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Fleet Status:</span>
+                <span className="font-medium">11/12 Current</span>
+              </div>
+              <Progress value={91} className="h-2" />
+              <div className="text-xs text-purple-700">
+                1 inspection due this month
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Alerts Section */}
+      <div className="space-y-4">
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-orange-800">
+            <strong>Action Required:</strong> PPE Training for 2 employees expires in 15 days. Schedule renewal training.
+          </AlertDescription>
+        </Alert>
+        
+        <Alert className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <strong>Urgent:</strong> VDOT Quality Assurance Certification expired. Contact VDOT for renewal process.
+          </AlertDescription>
+        </Alert>
+      </div>
+
+      {/* Detailed Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="osha" className="flex items-center gap-2">
-            <HardHat className="w-4 h-4" />
-            OSHA Virginia
-          </TabsTrigger>
-          <TabsTrigger value="vdot" className="flex items-center gap-2">
-            <Car className="w-4 h-4" />
-            VDOT
-          </TabsTrigger>
-          <TabsTrigger value="contractors" className="flex items-center gap-2">
-            <Scale className="w-4 h-4" />
-            VA Contractors
-          </TabsTrigger>
-          <TabsTrigger value="dmv" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            VA DMV
-          </TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="osha">OSHA Virginia</TabsTrigger>
+          <TabsTrigger value="vdot">VDOT</TabsTrigger>
+          <TabsTrigger value="licenses">Licenses & DMV</TabsTrigger>
         </TabsList>
 
-        {/* OSHA Virginia Section */}
-        <TabsContent value="osha" className="space-y-6">
+        <TabsContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HardHat className="w-5 h-5" />
-                  OSHA Virginia Requirements
-                </CardTitle>
-                <CardDescription>Current safety standards and training requirements</CardDescription>
+                <CardTitle>Upcoming Renewals</CardTitle>
+                <CardDescription>Items requiring attention in the next 90 days</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">OSHA 10-Hour Construction Safety</h4>
-                      <p className="text-sm text-gray-600">Required for all field employees</p>
-                    </div>
-                    <Badge variant="default">16/16 Certified</Badge>
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">PPE Training Renewal</p>
+                    <p className="text-sm text-gray-600">Expires: June 10, 2024</p>
                   </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">OSHA 30-Hour Construction</h4>
-                      <p className="text-sm text-gray-600">Required for supervisors</p>
-                    </div>
-                    <Badge variant="default">4/4 Certified</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Fall Protection Training</h4>
-                      <p className="text-sm text-gray-600">Annual requirement</p>
-                    </div>
-                    <Badge variant="outline">Due: March 2025</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Hazard Communication</h4>
-                      <p className="text-sm text-gray-600">SDS and chemical safety</p>
-                    </div>
-                    <Badge variant="default">Current</Badge>
-                  </div>
+                  <Badge variant="outline">15 days</Badge>
                 </div>
-
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Virginia follows federal OSHA standards with additional state requirements for construction safety.
-                  </AlertDescription>
-                </Alert>
+                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">VDOT QA Certification</p>
+                    <p className="text-sm text-gray-600">Expired: July 30, 2024</p>
+                  </div>
+                  <Badge variant="outline">Overdue</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div>
+                    <p className="font-medium">Fleet #002 Inspection</p>
+                    <p className="text-sm text-gray-600">Due: June 20, 2024</p>
+                  </div>
+                  <Badge variant="outline">25 days</Badge>
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Safety Program Documentation</CardTitle>
-                <CardDescription>Required OSHA documentation and programs</CardDescription>
+                <CardTitle>Virginia Industry Standards</CardTitle>
+                <CardDescription>Current compliance with state requirements</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Safety Manual
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    IIPP Program
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Emergency Plan
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Training Records
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Incident Reports
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start">
-                    <FileText className="w-4 h-4 mr-2" />
-                    PPE Program
-                  </Button>
-                </div>
-                
-                <div className="mt-4 p-3 bg-blue-50 rounded">
-                  <h4 className="font-medium text-blue-900">Virginia OSHA Contacts</h4>
-                  <div className="text-sm text-blue-800 mt-2 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3 h-3" />
-                      Richmond Area Office: (804) 371-8888
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3 h-3" />
-                      Norfolk Area Office: (757) 441-3820
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-3 h-3" />
-                      www.doli.virginia.gov/safety-health/
-                    </div>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Safety Training Compliance</span>
+                    <span className="text-sm font-medium">92%</span>
                   </div>
+                  <Progress value={92} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">License & Certification Status</span>
+                    <span className="text-sm font-medium">87%</span>
+                  </div>
+                  <Progress value={87} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Vehicle Compliance</span>
+                    <span className="text-sm font-medium">91%</span>
+                  </div>
+                  <Progress value={91} className="h-2" />
                 </div>
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
 
+        <TabsContent value="osha">
           <Card>
             <CardHeader>
-              <CardTitle>Asphalt Industry Safety Standards</CardTitle>
-              <CardDescription>Specific requirements for pavement and sealcoating operations</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <HardHat className="w-5 h-5" />
+                OSHA Virginia Safety Requirements
+              </CardTitle>
+              <CardDescription>
+                Occupational Safety and Health Administration requirements for Virginia construction
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">Hot Mix Asphalt Safety</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Heat-resistant PPE required</li>
-                    <li>• Burn prevention protocols</li>
-                    <li>• Proper ventilation requirements</li>
-                    <li>• Equipment safety procedures</li>
-                  </ul>
-                </div>
-                
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">Sealcoating Operations</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Chemical exposure protection</li>
-                    <li>• Respiratory protection program</li>
-                    <li>• Skin contact prevention</li>
-                    <li>• Emergency eyewash stations</li>
-                  </ul>
-                </div>
-                
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">Traffic Control</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• MUTCD compliance required</li>
-                    <li>• Flagging certification</li>
-                    <li>• High-visibility clothing</li>
-                    <li>• Work zone safety training</li>
-                  </ul>
-                </div>
+              <div className="space-y-4">
+                {oshaRequirements.map((req) => (
+                  <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="font-medium">{req.requirement}</h4>
+                      <p className="text-sm text-gray-600">Expires: {req.expiryDate}</p>
+                      <p className="text-sm text-gray-600">{req.employees}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className={req.color}>{req.status}</Badge>
+                      <Button variant="outline" size="sm">
+                        <FileText className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* VDOT Section */}
-        <TabsContent value="vdot" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Car className="w-5 h-5" />
-                  VDOT Prequalification Status
-                </CardTitle>
-                <CardDescription>Virginia Department of Transportation contractor requirements</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Prequalification Certificate</h4>
-                      <p className="text-sm text-gray-600">Current through December 2024</p>
+        <TabsContent value="vdot">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="w-5 h-5" />
+                VDOT Certifications & Requirements
+              </CardTitle>
+              <CardDescription>
+                Virginia Department of Transportation prequalification and project requirements
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {vdotRequirements.map((req) => (
+                  <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="font-medium">{req.requirement}</h4>
+                      <p className="text-sm text-gray-600">Certificate: {req.certNumber}</p>
+                      <p className="text-sm text-gray-600">Expires: {req.expiryDate}</p>
                     </div>
-                    <Badge variant="default">Active</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Work Class Authorization</h4>
-                      <p className="text-sm text-gray-600">Pavement/Surface Treatment</p>
-                    </div>
-                    <Badge variant="default">Approved</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">DBE Certification</h4>
-                      <p className="text-sm text-gray-600">Disadvantaged Business Enterprise</p>
-                    </div>
-                    <Badge variant="outline">Eligible</Badge>
-                  </div>
-                </div>
-
-                <Alert>
-                  <CheckCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Current VDOT prequalification allows bidding on state highway projects up to $2M.
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Technical Requirements</CardTitle>
-                <CardDescription>VDOT specifications and standards</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Material Certifications</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Asphalt Mix Designs:</span>
-                      <Badge variant="outline" size="sm">Current</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Aggregate Testing:</span>
-                      <Badge variant="outline" size="sm">Current</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>QC/QA Certification:</span>
-                      <Badge variant="outline" size="sm">Valid</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Field Technician:</span>
-                      <Badge variant="outline" size="sm">Certified</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={req.color}>{req.status}</Badge>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        VDOT Portal
+                      </Button>
                     </div>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium">Equipment Requirements</h4>
-                  <div className="text-sm space-y-1">
-                    <div className="flex justify-between">
-                      <span>Paving Equipment:</span>
-                      <span className="text-green-600">✓ Approved</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Compaction Equipment:</span>
-                      <span className="text-green-600">✓ Approved</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Testing Equipment:</span>
-                      <span className="text-green-600">✓ Calibrated</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 p-3 bg-blue-50 rounded">
-                  <h4 className="font-medium text-blue-900">VDOT Contacts</h4>
-                  <div className="text-sm text-blue-800 mt-2 space-y-1">
-                    <div>Richmond District: (804) 786-2801</div>
-                    <div>Hampton Roads District: (757) 494-5400</div>
-                    <div>Northern Virginia District: (703) 259-1794</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        {/* Virginia Board of Contractors Section */}
-        <TabsContent value="contractors" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="licenses">
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Scale className="w-5 h-5" />
-                  Virginia Contractor License
+                  Virginia Board of Contractors
                 </CardTitle>
-                <CardDescription>Board for Contractors license and specialty classifications</CardDescription>
+                <CardDescription>
+                  Professional licensing and specialty certifications
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">License Number: 2705123456</h4>
-                      <p className="text-sm text-gray-600">Class A Contractor License</p>
+              <CardContent>
+                <div className="space-y-4">
+                  {contractorRequirements.map((req) => (
+                    <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{req.requirement}</h4>
+                        <p className="text-sm text-gray-600">
+                          {req.licenseNumber ? `License: ${req.licenseNumber}` : req.hours}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {req.specialty ? `Specialty: ${req.specialty}` : `Due: ${req.expiryDate}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={req.color}>{req.status}</Badge>
+                        <Button variant="outline" size="sm">
+                          <FileText className="w-3 h-3 mr-1" />
+                          Details
+                        </Button>
+                      </div>
                     </div>
-                    <Badge variant="default">Active</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">PAV - Pavement Specialty</h4>
-                      <p className="text-sm text-gray-600">Asphalt paving and patching</p>
-                    </div>
-                    <Badge variant="default">Certified</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">License Expiration</h4>
-                      <p className="text-sm text-gray-600">April 30, 2025</p>
-                    </div>
-                    <Badge variant="outline">120 days</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Bond Amount</h4>
-                      <p className="text-sm text-gray-600">$50,000 required</p>
-                    </div>
-                    <Badge variant="default">Current</Badge>
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>PAV Specialty Requirements</CardTitle>
-                <CardDescription>Pavement and sealcoating specialty standards</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="p-3 border rounded">
-                    <h4 className="font-medium mb-2">PAV Classification Includes:</h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
-                      <li>• Hot mix asphalt paving</li>
-                      <li>• Cold patch repairs</li>
-                      <li>• Crack sealing operations</li>
-                      <li>• Surface treatments</li>
-                      <li>• Sealcoating applications</li>
-                      <li>• Line striping and marking</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="p-3 border rounded">
-                    <h4 className="font-medium mb-2">Experience Requirements:</h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
-                      <li>• Minimum 4 years pavement experience</li>
-                      <li>• Documented project history</li>
-                      <li>• Financial capability verification</li>
-                      <li>• Equipment ownership proof</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <Alert>
-                  <Building className="h-4 w-4" />
-                  <AlertDescription>
-                    Virginia Board for Contractors: (804) 367-8511 | www.dpor.virginia.gov/boards/contractors
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Continuing Education & Renewal</CardTitle>
-              <CardDescription>Required training and license maintenance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">CE Requirements</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• 8 hours every 2 years</li>
-                    <li>• DPOR approved courses</li>
-                    <li>• Business/safety focused</li>
-                    <li>• Due by license expiration</li>
-                  </ul>
-                  <Badge variant="default" className="mt-2">6/8 Hours Complete</Badge>
-                </div>
-                
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">Annual Reports</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Financial statements</li>
-                    <li>• Insurance verification</li>
-                    <li>• Worker's compensation</li>
-                    <li>• Project completion list</li>
-                  </ul>
-                  <Badge variant="outline" className="mt-2">Due: March 2025</Badge>
-                </div>
-                
-                <div className="p-4 border rounded">
-                  <h4 className="font-medium mb-2">License Fees</h4>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Class A: $330 biennial</li>
-                    <li>• PAV Specialty: $165</li>
-                    <li>• Late fee: $165</li>
-                    <li>• Reinstatement: $495</li>
-                  </ul>
-                  <Badge variant="default" className="mt-2">Paid Current</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Virginia DMV Section */}
-        <TabsContent value="dmv" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Virginia DMV Requirements
+                  <Building className="w-5 h-5" />
+                  Virginia DMV Fleet Compliance
                 </CardTitle>
-                <CardDescription>Commercial vehicle registration and inspection requirements</CardDescription>
+                <CardDescription>
+                  Vehicle inspections, registrations, and commercial permits
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Commercial Vehicle Registrations</h4>
-                      <p className="text-sm text-gray-600">12 vehicles registered</p>
+              <CardContent>
+                <div className="space-y-4">
+                  {dmvRequirements.map((req) => (
+                    <div key={req.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{req.vehicle}</h4>
+                        <p className="text-sm text-gray-600">
+                          Inspection: {req.inspection} (Expires: {req.expiryDate})
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Registration: {req.registration} (Expires: {req.regExpiry})
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={req.color}>{req.inspection}</Badge>
+                        <Button variant="outline" size="sm">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          Schedule
+                        </Button>
+                      </div>
                     </div>
-                    <Badge variant="default">Current</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">Annual Safety Inspections</h4>
-                      <p className="text-sm text-gray-600">All vehicles inspected</p>
-                    </div>
-                    <Badge variant="outline">2 Due Soon</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">CDL Requirements</h4>
-                      <p className="text-sm text-gray-600">8 drivers with valid CDLs</p>
-                    </div>
-                    <Badge variant="default">Compliant</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <h4 className="font-medium">IFTA Registration</h4>
-                      <p className="text-sm text-gray-600">International Fuel Tax Agreement</p>
-                    </div>
-                    <Badge variant="default">Active</Badge>
-                  </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>DOT Compliance</CardTitle>
-                <CardDescription>Federal and state transportation regulations</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="p-3 border rounded">
-                    <h4 className="font-medium mb-2">USDOT Number: 1234567</h4>
-                    <p className="text-sm text-gray-600">Active interstate authority</p>
-                  </div>
-                  
-                  <div className="p-3 border rounded">
-                    <h4 className="font-medium mb-2">Hours of Service Compliance</h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
-                      <li>• Electronic logging devices (ELD)</li>
-                      <li>• Driver duty status monitoring</li>
-                      <li>• Rest period compliance</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="p-3 border rounded">
-                    <h4 className="font-medium mb-2">Drug & Alcohol Testing</h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
-                      <li>• DOT-compliant testing program</li>
-                      <li>• Random testing consortium</li>
-                      <li>• MRO services contracted</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <Alert>
-                  <Car className="h-4 w-4" />
-                  <AlertDescription>
-                    Virginia DMV: (804) 497-7100 | Commercial Services: dmvNOW.com
-                  </AlertDescription>
-                </Alert>
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Vehicle Inspection Schedule</CardTitle>
-              <CardDescription>Upcoming inspection dates and requirements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <div className="p-3 border rounded">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium">Truck #101</span>
-                      <Badge variant="destructive">Due 01/15</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">2019 Ford F-550 Dump</p>
-                    <p className="text-xs text-gray-500">Last: 01/15/2024</p>
-                  </div>
-                  
-                  <div className="p-3 border rounded">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium">Truck #102</span>
-                      <Badge variant="outline">Due 02/20</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">2020 Chevrolet 3500</p>
-                    <p className="text-xs text-gray-500">Last: 02/20/2024</p>
-                  </div>
-                  
-                  <div className="p-3 border rounded">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium">Truck #103</span>
-                      <Badge variant="default">Current</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">2021 Ram 5500</p>
-                    <p className="text-xs text-gray-500">Last: 08/15/2024</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>
