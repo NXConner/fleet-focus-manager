@@ -6,7 +6,7 @@ import EmployeeManagement from "./EmployeeManagement";
 import VehicleManagement from "./VehicleManagement";
 import EquipmentManagement from "./EquipmentManagement";
 import InsuranceManagement from "./InsuranceManagement";
-import MaintenanceChecklist from "./MaintenanceChecklist";
+import { MaintenanceChecklist } from "./MaintenanceChecklist";
 import AccountingDashboard from "./AccountingDashboard";
 import { 
   Users, 
@@ -121,7 +121,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="maintenance">
-            <MaintenanceChecklist />
+            <MaintenanceChecklist vehicleId={1} />
           </TabsContent>
 
           <TabsContent value="accounting">
