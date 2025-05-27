@@ -15,6 +15,8 @@ import EmployeeMap from "../EmployeeMap";
 import PayrollManagement from "../PayrollManagement";
 import VirginiaCompliance from "../VirginiaCompliance";
 import LineStripping from "../LineStripping";
+import SealcoatManagement from "../SealcoatManagement";
+import AsphaltRepairManagement from "../AsphaltRepairManagement";
 import { 
   Users, 
   Car, 
@@ -27,13 +29,14 @@ import {
   MapPin,
   Scale,
   PaintBucket,
-  Navigation
+  Navigation,
+  Settings
 } from "lucide-react";
 
 const DashboardTabs = () => {
   return (
     <Tabs defaultValue="employees" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-12">
+      <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7">
         <TabsTrigger value="employees" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           Employees
@@ -62,6 +65,9 @@ const DashboardTabs = () => {
           <Receipt className="h-4 w-4" />
           Receipts
         </TabsTrigger>
+      </TabsList>
+
+      <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 mt-2">
         <TabsTrigger value="timetracker" className="flex items-center gap-2">
           <Clock className="h-4 w-4" />
           Time Tracker
@@ -81,6 +87,14 @@ const DashboardTabs = () => {
         <TabsTrigger value="linestripping" className="flex items-center gap-2">
           <PaintBucket className="h-4 w-4" />
           Line Stripping
+        </TabsTrigger>
+        <TabsTrigger value="sealcoat" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" />
+          Sealcoat
+        </TabsTrigger>
+        <TabsTrigger value="asphalt" className="flex items-center gap-2">
+          <Settings className="h-4 w-4" />
+          Asphalt Repair
         </TabsTrigger>
       </TabsList>
 
@@ -148,6 +162,14 @@ const DashboardTabs = () => {
 
       <TabsContent value="linestripping">
         <LineStripping />
+      </TabsContent>
+
+      <TabsContent value="sealcoat">
+        <SealcoatManagement />
+      </TabsContent>
+
+      <TabsContent value="asphalt">
+        <AsphaltRepairManagement />
       </TabsContent>
     </Tabs>
   );
