@@ -121,6 +121,7 @@ const EmployeeDetailsModal = ({ employee, isOpen, onClose, onUpdate }: EmployeeD
   if (!employee) return null;
 
   const compliance = getComplianceStatus();
+  const handbookDocuments = documents.filter((doc: any) => doc.document_type === 'handbook');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -137,6 +138,55 @@ const EmployeeDetailsModal = ({ employee, isOpen, onClose, onUpdate }: EmployeeD
                 <span>•</span>
                 <span>Employee ID: {employee.id}</span>
               </DialogDescription>
+              {/* Show handbook status */}
+              {handbookDocuments.length > 0 && (
+                <div className="flex items-center gap-2 mt-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-green-700">Employee Handbook Available</span>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => {
+                      // Download the latest handbook
+                      const latestHandbook = handbookDocuments[0];
+                      if (latestHandbook) {
+                        const downloadDoc = async () => {
+                          try {
+                            const { data, error } = await supabase.storage
+                              .from('employee-documents')
+                              .download(latestHandbook.file_path);
+
+                            if (error) throw error;
+
+                            const url = URL.createObjectURL(data);
+                            const link = window.document.createElement('a');
+                            link.href = url;
+                            link.download = latestHandbook.file_name;
+                            link.click();
+                            URL.revokeObjectURL(url);
+
+                            toast({
+                              title: "Download Started",
+                              description: `${latestHandbook.file_name} is being downloaded.`,
+                            });
+                          } catch (error) {
+                            console.error('Download error:', error);
+                            toast({
+                              title: "Download Failed",
+                              description: "Failed to download handbook.",
+                              variant: "destructive",
+                            });
+                          }
+                        };
+                        downloadDoc();
+                      }
+                    }}
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    Download Handbook
+                  </Button>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               {isEditing ? (
