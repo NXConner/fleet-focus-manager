@@ -10,6 +10,7 @@ import AccountingDashboard from "../AccountingDashboard";
 import ReceiptManagement from "../ReceiptManagement";
 import TaxManagement from "../TaxManagement";
 import TimeTracker from "../TimeTracker";
+import GeofencedTimeTracker from "../GeofencedTimeTracker";
 import EmployeeMap from "../EmployeeMap";
 import PayrollManagement from "../PayrollManagement";
 import VirginiaCompliance from "../VirginiaCompliance";
@@ -25,13 +26,14 @@ import {
   Clock,
   MapPin,
   Scale,
-  PaintBucket
+  PaintBucket,
+  Navigation
 } from "lucide-react";
 
 const DashboardTabs = () => {
   return (
     <Tabs defaultValue="employees" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-11">
+      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-12">
         <TabsTrigger value="employees" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           Employees
@@ -63,6 +65,10 @@ const DashboardTabs = () => {
         <TabsTrigger value="timetracker" className="flex items-center gap-2">
           <Clock className="h-4 w-4" />
           Time Tracker
+        </TabsTrigger>
+        <TabsTrigger value="geofencing" className="flex items-center gap-2">
+          <Navigation className="h-4 w-4" />
+          Geofenced Time
         </TabsTrigger>
         <TabsTrigger value="gps" className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />
@@ -126,6 +132,10 @@ const DashboardTabs = () => {
 
       <TabsContent value="timetracker">
         <TimeTracker />
+      </TabsContent>
+
+      <TabsContent value="geofencing">
+        <GeofencedTimeTracker />
       </TabsContent>
 
       <TabsContent value="gps">

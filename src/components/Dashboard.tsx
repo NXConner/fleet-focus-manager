@@ -3,6 +3,7 @@ import React from "react";
 import DashboardHeader from "./dashboard/DashboardHeader";
 import QuickStats from "./dashboard/QuickStats";
 import ComplianceStats from "./dashboard/ComplianceStats";
+import GPSMapWidget from "./dashboard/GPSMapWidget";
 import DashboardTabs from "./dashboard/DashboardTabs";
 
 const Dashboard = () => {
@@ -16,8 +17,11 @@ const Dashboard = () => {
         {/* Quick Stats */}
         <QuickStats />
 
-        {/* Virginia Compliance Stats Row */}
-        <ComplianceStats />
+        {/* GPS Map and Compliance Stats Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <GPSMapWidget />
+          <ComplianceStats />
+        </div>
 
         <DashboardTabs />
       </div>
