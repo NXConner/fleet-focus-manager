@@ -56,8 +56,12 @@ const EnhancedGPSMap = () => {
   const [trackingHistory, setTrackingHistory] = useState<TrackingHistory[]>([]);
   const [isPlayingBack, setIsPlayingBack] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState(0);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState('');
+  const [mapboxToken, setMapboxToken] = useState(
+    (import.meta.env.VITE_MAPBOX_TOKEN as string | undefined) || ''
+  );
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState(
+    (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || ''
+  );
   const [selectedMapSource, setSelectedMapSource] = useState('esri-satellite');
   const [showApiSettings, setShowApiSettings] = useState(false);
   const [currentMap, setCurrentMap] = useState<GenericMap | null>(null);
