@@ -8,7 +8,7 @@ interface MultiProviderMapProps {
   mapSource: MapSource;
   center: [number, number];
   zoom: number;
-  onMapLoad?: (map: any) => void;
+  onMapLoad?: (map: unknown) => void;
   mapboxToken?: string;
   googleMapsApiKey?: string;
   className?: string;
@@ -24,7 +24,7 @@ const MultiProviderMap: React.FC<MultiProviderMapProps> = ({
   className = "w-full h-full"
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<any>(null);
+  const map = useRef<{ remove?: () => void } | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const MultiProviderMap: React.FC<MultiProviderMapProps> = ({
 
     // Clean up existing map
     if (map.current) {
-      map.current.remove();
+      map.current.remove?.();
       map.current = null;
     }
 
@@ -160,8 +160,8 @@ const MultiProviderMap: React.FC<MultiProviderMapProps> = ({
 // Extend window object for Google Maps and Leaflet
 declare global {
   interface Window {
-    google: any;
-    L: any;
+    google?: { maps: unknown };
+    L?: unknown;
     initGoogleMap: () => void;
   }
 }
