@@ -1,9 +1,13 @@
 
-import React from "react";
-import EnhancedGPSMap from "./EnhancedGPSMap";
+import React, { Suspense } from "react";
+const EnhancedGPSMap = React.lazy(() => import("./EnhancedGPSMap"));
 
 const GPSMapWidget = () => {
-  return <EnhancedGPSMap />;
+  return (
+    <Suspense fallback={null}>
+      <EnhancedGPSMap />
+    </Suspense>
+  );
 };
 
 export default GPSMapWidget;
