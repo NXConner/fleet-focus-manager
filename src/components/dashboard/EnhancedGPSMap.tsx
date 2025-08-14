@@ -36,6 +36,20 @@ interface TrackingHistory {
   accuracy: number;
 }
 
+type GenericMap = {
+  flyTo?: (opts: { center: [number, number]; zoom: number; duration: number }) => void;
+  setCenter?: (pos: { lat: number; lng: number }) => void;
+  setZoom?: (zoom: number) => void;
+  setView?: (coords: [number, number], zoom: number) => void;
+};
+
+type MarkerLike = {
+  remove?: () => void;
+  setMap?: (map: unknown | null) => void;
+  bindPopup?: (html: string) => void;
+  on?: (event: string, handler: () => void) => void;
+};
+
 const EnhancedGPSMap = () => {
   const [locations, setLocations] = useState<EmployeeLocation[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<number | null>(null);
@@ -46,8 +60,8 @@ const EnhancedGPSMap = () => {
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState('');
   const [selectedMapSource, setSelectedMapSource] = useState('esri-satellite');
   const [showApiSettings, setShowApiSettings] = useState(false);
-  const [currentMap, setCurrentMap] = useState<any>(null);
-  const markersRef = useRef<{ [key: number]: any }>({});
+  const [currentMap, setCurrentMap] = useState<GenericMap | null>(null);
+  const markersRef = useRef<{ [key: number]: MarkerLike }>({});
 
   // Patrick County, Virginia coordinates
   const PATRICK_COUNTY = {
@@ -221,14 +235,15 @@ const EnhancedGPSMap = () => {
     return R * c;
   };
 
-  const handleMapLoad = (map: any) => {
-    setCurrentMap(map);
+  const handleMapLoad = (map: unknown) => {
+    const typedMap = map as GenericMap;
+    setCurrentMap(typedMap);
     if (locations.length > 0) {
-      addMarkersToMap(map);
+      addMarkersToMap(typedMap);
     }
   };
 
-  const addMarkersToMap = (map: any) => {
+  const addMarkersToMap = (map: GenericMap | null) => {
     if (!map || !locations.length) return;
 
     // Clear existing markers
@@ -249,7 +264,7 @@ const EnhancedGPSMap = () => {
     });
   };
 
-  const addMapboxMarker = (map: any, location: EmployeeLocation) => {
+  const addMapboxMarker = (map: GenericMap, location: EmployeeLocation) => {
     const el = document.createElement('div');
     el.className = 'employee-marker';
     el.style.cssText = `
@@ -264,20 +279,20 @@ const EnhancedGPSMap = () => {
 
     const marker = new window.mapboxgl.Marker(el)
       .setLngLat([location.longitude, location.latitude])
-      .addTo(map);
+      .addTo(map as unknown as any);
 
     const popup = new window.mapboxgl.Popup({ offset: 25 })
       .setHTML(getMarkerPopupContent(location));
 
     marker.setPopup(popup);
     el.addEventListener('click', () => handleMarkerClick(location));
-    markersRef.current[location.employee_id] = marker;
+    markersRef.current[location.employee_id] = marker as unknown as MarkerLike;
   };
 
-  const addGoogleMarker = (map: any, location: EmployeeLocation) => {
+  const addGoogleMarker = (map: GenericMap, location: EmployeeLocation) => {
     const marker = new window.google.maps.Marker({
       position: { lat: location.latitude, lng: location.longitude },
-      map: map,
+      map: map as unknown as any,
       title: `${location.employee.first_name} ${location.employee.last_name}`,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
@@ -294,25 +309,25 @@ const EnhancedGPSMap = () => {
     });
 
     marker.addListener('click', () => {
-      infoWindow.open(map, marker);
+      infoWindow.open(map as unknown as any, marker);
       handleMarkerClick(location);
     });
 
-    markersRef.current[location.employee_id] = marker;
+    markersRef.current[location.employee_id] = marker as unknown as MarkerLike;
   };
 
-  const addLeafletMarker = (map: any, location: EmployeeLocation) => {
+  const addLeafletMarker = (map: GenericMap, location: EmployeeLocation) => {
     const marker = window.L.circleMarker([location.latitude, location.longitude], {
       radius: 10,
       fillColor: '#10b981',
       fillOpacity: 1,
       color: 'white',
       weight: 2
-    }).addTo(map);
+    }).addTo(map as unknown as any);
 
     marker.bindPopup(getMarkerPopupContent(location));
     marker.on('click', () => handleMarkerClick(location));
-    markersRef.current[location.employee_id] = marker;
+    markersRef.current[location.employee_id] = marker as unknown as MarkerLike;
   };
 
   const getMarkerPopupContent = (location: EmployeeLocation) => {
