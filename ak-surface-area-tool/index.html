@@ -19,6 +19,17 @@
 		.panel .small { color: #666; font-size: 12px; }
 		.footer-note { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 6px 8px; border: 1px solid #eee; border-radius: 4px; font-size: 12px; z-index: 900; }
 	</style>
+	<style>
+		.estimator { position: absolute; top: 70px; left: 10px; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 1000; width: 320px; max-height: 75%; overflow: auto; }
+		.estimator h3 { margin: 0 0 8px; font-size: 16px; }
+		.estimator fieldset { border: 1px solid #eee; margin: 8px 0; padding: 6px; }
+		.estimator fieldset legend { font-size: 13px; padding: 0 4px; }
+		.estimator .row { display: grid; grid-template-columns: 1fr 110px; gap: 6px; align-items: center; margin: 4px 0; }
+		.estimator input[type="number"], .estimator input[type="text"] { width: 100%; padding: 4px; font-size: 13px; }
+		.estimator label { font-size: 13px; }
+		.estimator .small { font-size: 12px; color: #666; }
+		#estimateBtn { padding: 8px 10px; font-size: 14px; cursor: pointer; }
+	</style>
 </head>
 <body>
 	<div id="app">
@@ -36,6 +47,78 @@
 		<div class="row"><span>Area (sq yd):</span><strong id="sqyd">0</strong></div>
 		<div class="row"><span>Area (acres):</span><strong id="acres">0</strong></div>
 		<div class="row small"><span>Polygons:</span><span id="polyCount">0</span></div>
+	</div>
+	<div class="estimator" id="estimator">
+		<h3>Estimator</h3>
+		<fieldset>
+			<legend>Sealcoating</legend>
+			<div class="row"><label for="sc_area">Area (sq ft)</label><input type="number" id="sc_area" value="0" min="0" /></div>
+			<div class="row"><label></label><button type="button" id="useMeasured">Use Measured</button></div>
+			<div class="row"><label for="sc_coats">Coats</label><input type="number" id="sc_coats" value="2" min="1" /></div>
+			<div class="row"><label for="sc_coverage">Coverage (sq ft/gal mixed)</label><input type="number" id="sc_coverage" value="76" min="1" /></div>
+			<div class="row"><label for="sc_water_pct">Water % (of concentrate)</label><input type="number" id="sc_water_pct" value="20" min="0" max="30" /></div>
+			<div class="row"><label for="pmm_price">PMM $/gal (concentrate)</label><input type="number" id="pmm_price" value="3.79" step="0.01" min="0" /></div>
+			<div class="row"><label for="sand_per_100">Sand bags per 100 gal conc</label><input type="number" id="sand_per_100" value="6" min="0" /></div>
+			<div class="row"><label for="sand_price">Sand $/bag (50 lb)</label><input type="number" id="sand_price" value="10" step="0.01" min="0" /></div>
+			<div class="row"><label><input type="checkbox" id="use_fastdry" checked /> Use Fast Dry (2 gal/125 gal conc)</label><span></span></div>
+			<div class="row"><label for="fd_bucket_price">Fast Dry $/5-gal bucket</label><input type="number" id="fd_bucket_price" value="50" step="0.01" min="0" /></div>
+			<div class="row"><label><input type="checkbox" id="use_prepseal" /> Use Prep Seal (oil spots)</label><span></span></div>
+			<div class="row"><label for="oil_area">Oil spot area (sq ft)</label><input type="number" id="oil_area" value="0" min="0" /></div>
+			<div class="row"><label for="prep_bucket_cov">Prep Seal coverage per 5-gal (sq ft)</label><input type="number" id="prep_bucket_cov" value="900" min="1" /></div>
+			<div class="row"><label for="prep_bucket_price">Prep Seal $/5-gal bucket</label><input type="number" id="prep_bucket_price" value="50" step="0.01" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Crack Filling</legend>
+			<div class="row"><label for="crack_ft">Linear feet</label><input type="number" id="crack_ft" value="0" min="0" /></div>
+			<div class="row"><label for="yield_ft_box">Yield ft per 30lb box</label><input type="number" id="yield_ft_box" value="250" min="1" /></div>
+			<div class="row"><label for="box_price">$ per 30lb box</label><input type="number" id="box_price" value="44.95" step="0.01" min="0" /></div>
+			<div class="row"><label for="cf_labor_per_100">Labor hours per 100 ft</label><input type="number" id="cf_labor_per_100" value="1" step="0.1" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Patching</legend>
+			<div class="row"><label for="patch_sf">Patch area (sq ft)</label><input type="number" id="patch_sf" value="0" min="0" /></div>
+			<div class="row"><label for="patch_unit_price">Unit price $/sq ft</label><input type="number" id="patch_unit_price" value="4" step="0.01" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Line Striping</legend>
+			<div class="row"><label for="single_stalls">Single stalls</label><input type="number" id="single_stalls" value="0" min="0" /></div>
+			<div class="row"><label for="double_stalls">Double stalls</label><input type="number" id="double_stalls" value="0" min="0" /></div>
+			<div class="row"><label for="extra_lf">Extra linear feet</label><input type="number" id="extra_lf" value="0" min="0" /></div>
+			<div class="row"><label for="striping_unit_price">Unit price $/linear ft</label><input type="number" id="striping_unit_price" value="0.9" step="0.01" min="0" /></div>
+			<div class="row"><label for="handicap_count">Handicap symbols</label><input type="number" id="handicap_count" value="0" min="0" /></div>
+			<div class="row"><label for="handicap_price">$ per handicap symbol</label><input type="number" id="handicap_price" value="35" step="0.01" min="0" /></div>
+			<div class="row"><label for="arrow_count">Arrows</label><input type="number" id="arrow_count" value="0" min="0" /></div>
+			<div class="row"><label for="arrow_price">$ per arrow</label><input type="number" id="arrow_price" value="15" step="0.01" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Travel & Equipment</legend>
+			<div class="row"><label for="rt_miles">Round-trip miles</label><input type="number" id="rt_miles" value="0" min="0" /></div>
+			<div class="row"><label for="mpg">Truck MPG</label><input type="number" id="mpg" value="15" min="1" /></div>
+			<div class="row"><label for="fuel_price">Fuel $/gal</label><input type="number" id="fuel_price" value="3.5" step="0.01" min="0" /></div>
+			<div class="row"><label for="equip_idle_hours">Equipment idle hours</label><input type="number" id="equip_idle_hours" value="0" step="0.1" min="0" /></div>
+			<div class="row"><label for="equip_idle_rate">Idle rate $/hr</label><input type="number" id="equip_idle_rate" value="50" step="0.01" min="0" /></div>
+			<div class="row"><label for="equip_active_hours">Equipment active hours</label><input type="number" id="equip_active_hours" value="0" step="0.1" min="0" /></div>
+			<div class="row"><label for="equip_gph">Active fuel gal/hr</label><input type="number" id="equip_gph" value="2" step="0.1" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Labor, Overhead & Profit</legend>
+			<div class="row"><label for="labor_rate">Labor $/person-hour</label><input type="number" id="labor_rate" value="55" step="0.01" min="0" /></div>
+			<div class="row"><label for="sc_ph_per_1000">Sealcoat person-hours per 1,000 sq ft per coat</label><input type="number" id="sc_ph_per_1000" value="4" step="0.1" min="0" /></div>
+			<div class="row"><label for="overhead_pct">Overhead %</label><input type="number" id="overhead_pct" value="10" step="0.1" min="0" /></div>
+			<div class="row"><label for="profit_pct">Profit %</label><input type="number" id="profit_pct" value="20" step="0.1" min="0" /></div>
+		</fieldset>
+		<fieldset>
+			<legend>Transport Load Check</legend>
+			<div class="row"><label><input type="checkbox" id="check_transport" /> Include transport check</label><span></span></div>
+			<div class="row"><label for="fill_pct">SK 550 tank fill %</label><input type="number" id="fill_pct" value="100" min="0" max="100" /></div>
+			<div class="row"><label for="truck_curb_wt">Truck curb weight (lb)</label><input type="number" id="truck_curb_wt" value="4300" min="0" /></div>
+			<div class="row"><label for="gvwr">Truck GVWR (lb)</label><input type="number" id="gvwr" value="12000" min="0" /></div>
+			<div class="row"><label for="crew_count">Crew count</label><input type="number" id="crew_count" value="3" min="0" /></div>
+			<div class="row"><label for="crew_wt">Avg crew weight (lb)</label><input type="number" id="crew_wt" value="180" min="0" /></div>
+			<div class="row"><label for="other_wt">Other materials weight (lb)</label><input type="number" id="other_wt" value="0" min="0" /></div>
+		</fieldset>
+		<div class="row"><button id="estimateBtn">Estimate Now</button><span></span></div>
+		<div id="estimateOutput" class="small"></div>
 	</div>
 	<div class="footer-note">Draw polygons or rectangles. Double-click to finish a shape. Edit/delete with the toolbar.</div>
 
@@ -79,7 +162,7 @@
 				}
 				if (layer.getLatLngs) {
 					const latlngs = layer.getLatLngs();
-					const coords = latlngs[0].map(p => [p.lng, p.lat]);
+					const coords = (Array.isArray(latlngs[0]) ? latlngs[0] : latlngs).map(p => [p.lng, p.lat]);
 					if (coords.length >= 3) {
 						const poly = turf.polygon([[...coords, coords[0]]]);
 						totalSqMeters += turf.area(poly);
@@ -93,6 +176,7 @@
 			document.getElementById('sqyd').textContent = Math.round(sqyd).toLocaleString();
 			document.getElementById('acres').textContent = acres.toFixed(4);
 			document.getElementById('polyCount').textContent = polygonCount;
+			document.getElementById('sc_area').value = Math.round(sqft);
 		}
 
 		map.on(L.Draw.Event.CREATED, function (e) {
@@ -135,6 +219,145 @@
 		});
 		input.addEventListener('keydown', (e) => { if (e.key === 'Enter') searchBtn.click(); });
 
+		document.getElementById('useMeasured').addEventListener('click', () => {
+			document.getElementById('sc_area').value = document.getElementById('sqft').textContent.replace(/,/g, '');
+		});
+
+		function calcEstimate() {
+			const v = id => parseFloat(document.getElementById(id).value || '0');
+			const checked = id => document.getElementById(id).checked;
+
+			// Sealcoat material math
+			const areaSqFt = v('sc_area');
+			const coats = Math.max(1, v('sc_coats'));
+			const coverage = v('sc_coverage'); // per gallon mixed
+			const waterPct = v('sc_water_pct') / 100; // of concentrate
+			const pmmPrice = v('pmm_price');
+			const sandPer100 = v('sand_per_100'); // 50 lb bags per 100 gal concentrate
+			const sandPrice = v('sand_price');
+			const useFastDry = checked('use_fastdry');
+			const fdBucketPrice = v('fd_bucket_price');
+			const usePrepSeal = checked('use_prepseal');
+			const oilArea = v('oil_area');
+			const prepCovPerBucket = v('prep_bucket_cov');
+			const prepBucketPrice = v('prep_bucket_price');
+
+			const totalMixedGallons = (areaSqFt / coverage) * coats;
+			const concentrateGallons = totalMixedGallons / (1 + waterPct);
+			const waterGallons = totalMixedGallons - concentrateGallons;
+			const sandBags = (concentrateGallons / 100) * sandPer100;
+			const pmmCost = concentrateGallons * pmmPrice;
+			const sandCost = sandBags * sandPrice;
+			let fastDryGallons = 0, fastDryBuckets = 0, fastDryCost = 0;
+			if (useFastDry) {
+				fastDryGallons = (concentrateGallons / 125) * 2; // 2 gal per 125 gal concentrate
+				fastDryBuckets = Math.ceil(fastDryGallons / 5);
+				fastDryCost = fastDryBuckets * fdBucketPrice;
+			}
+			let prepBuckets = 0, prepCost = 0;
+			if (usePrepSeal && oilArea > 0) {
+				prepBuckets = Math.ceil(oilArea / prepCovPerBucket);
+				prepCost = prepBuckets * prepBucketPrice;
+			}
+
+			// Crack filling
+			const crackFt = v('crack_ft');
+			const yieldFtPerBox = v('yield_ft_box');
+			const boxPrice = v('box_price');
+			const cfLaborPer100 = v('cf_labor_per_100');
+			const boxes = crackFt > 0 ? Math.ceil(crackFt / yieldFtPerBox) : 0;
+			const crackMatCost = boxes * boxPrice;
+			const crackLaborHours = (crackFt / 100) * cfLaborPer100;
+
+			// Patching (use unit price as all-in placeholder)
+			const patchSf = v('patch_sf');
+			const patchUnitPrice = v('patch_unit_price');
+			const patchCost = patchSf * patchUnitPrice;
+
+			// Striping
+			const singleStalls = v('single_stalls');
+			const doubleStalls = v('double_stalls');
+			const extraLf = v('extra_lf');
+			const stripUnit = v('striping_unit_price');
+			const handicapCount = v('handicap_count');
+			const handicapPrice = v('handicap_price');
+			const arrowCount = v('arrow_count');
+			const arrowPrice = v('arrow_price');
+			const lineLf = singleStalls * 20 + doubleStalls * 25 + extraLf;
+			const stripingCost = lineLf * stripUnit + handicapCount * handicapPrice + arrowCount * arrowPrice;
+
+			// Labor for sealcoating application (crew size accounted via person-hours)
+			const laborRate = v('labor_rate');
+			const scPhPer1000 = v('sc_ph_per_1000');
+			const scPersonHours = (areaSqFt / 1000) * scPhPer1000 * coats;
+			const cfPersonHours = crackLaborHours; // already in hours
+			// Note: Patch labor included in patch unit price for simplicity here
+			const totalLaborHours = scPersonHours + cfPersonHours;
+			const laborCost = totalLaborHours * laborRate;
+
+			// Travel & equipment
+			const rtMiles = v('rt_miles');
+			const mpg = v('mpg');
+			const fuelPrice = v('fuel_price');
+			const equipIdleHours = v('equip_idle_hours');
+			const equipIdleRate = v('equip_idle_rate');
+			const equipActiveHours = v('equip_active_hours');
+			const equipGph = v('equip_gph');
+			const travelFuelGallons = mpg > 0 ? (rtMiles / mpg) : 0;
+			const travelFuelCost = travelFuelGallons * fuelPrice;
+			const equipFuelCost = equipActiveHours * equipGph * fuelPrice;
+			const equipIdleCost = equipIdleHours * equipIdleRate;
+
+			// Subtotals
+			const materialCost = pmmCost + sandCost + fastDryCost + prepCost + crackMatCost;
+			const equipmentFuelCost = travelFuelCost + equipFuelCost + equipIdleCost;
+			const stripingSubtotal = stripingCost;
+			const patchingSubtotal = patchCost;
+			const laborSubtotal = laborCost;
+			const subtotal = materialCost + equipmentFuelCost + stripingSubtotal + patchingSubtotal + laborSubtotal;
+
+			// Overhead & Profit
+			const overheadPct = v('overhead_pct') / 100;
+			const profitPct = v('profit_pct') / 100;
+			const overhead = subtotal * overheadPct;
+			const profit = (subtotal + overhead) * profitPct;
+			const total = subtotal + overhead + profit;
+
+			// Transport check
+			let transportNote = '';
+			if (document.getElementById('check_transport').checked) {
+				const fillPct = v('fill_pct') / 100;
+				const truckCurb = v('truck_curb_wt');
+				const gvwr = v('gvwr');
+				const crewCount = v('crew_count');
+				const crewWt = v('crew_wt');
+				const otherWt = v('other_wt');
+				const tankGallons = 550 * fillPct;
+				const sealerWeight = tankGallons * 10; // lb per gallon
+				const unitEmpty = 1865; // lb
+				const crewWeight = crewCount * crewWt;
+				const totalLoad = truckCurb + unitEmpty + sealerWeight + crewWeight + otherWt;
+				const pctGVWR = gvwr > 0 ? (totalLoad / gvwr) * 100 : 0;
+				transportNote = `Transport load est: ${Math.round(totalLoad).toLocaleString()} lb (${pctGVWR.toFixed(0)}% of GVWR)`;
+				if (gvwr > 0 && totalLoad > gvwr) transportNote += ' — WARNING: exceeds GVWR!';
+			}
+
+			const fmt = n => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+			document.getElementById('estimateOutput').innerHTML = `
+				<div><strong>Material</strong></div>
+				<div class="small">PMM: $${fmt(pmmCost)} | Sand: $${fmt(sandCost)} | FastDry: $${fmt(fastDryCost)} | PrepSeal: $${fmt(prepCost)} | Crack filler: $${fmt(crackMatCost)}</div>
+				<div><strong>Labor</strong> $${fmt(laborSubtotal)} (${fmt(totalLaborHours)} person-hours)</div>
+				<div><strong>Travel & Equipment</strong> $${fmt(equipmentFuelCost)}</div>
+				<div><strong>Patching</strong> $${fmt(patchingSubtotal)} | <strong>Striping</strong> $${fmt(stripingSubtotal)}</div>
+				<div><strong>Subtotal</strong> $${fmt(subtotal)}</div>
+				<div>Overhead (${(overheadPct*100).toFixed(1)}%) $${fmt(overhead)}</div>
+				<div>Profit (${(profitPct*100).toFixed(1)}%) $${fmt(profit)}</div>
+				<div><strong>Total Estimate</strong> $${fmt(total)}</div>
+				<div class="small">Notes: Prices assume materials from SealMaster Madison, NC. Estimate valid 30 days. Subject to site inspection. ${transportNote}</div>
+			`;
+		}
+
+		document.getElementById('estimateBtn').addEventListener('click', calcEstimate);
 		updateStats();
 	</script>
 </body>
