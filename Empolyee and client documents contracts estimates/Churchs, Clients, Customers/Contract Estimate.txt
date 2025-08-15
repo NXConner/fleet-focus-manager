@@ -1,0 +1,31 @@
+Contract Estimate for Driveway / Parking Lot Repair:
+
+Client: [Client Name] Address: [Client Address] Date: [Date]
+
+Contractor: [Contractor Name] Address: [Contractor Address] Phone: [Contractor Phone] Email: [Contractor Email]
+
+Scope of Work:
+Asphalt Patching: If needed, Repair all potholes and damaged areas with new asphalt.
+Crack Fixing: Fill all cracks with a suitable crack filler to prevent water infiltration and further damage.
+Sealcoating: Apply a layer of sealcoat to protect the asphalt surface from weather elements and extend its lifespan.
+Line Stripping: Repaint all parking lot lines to ensure clear and safe traffic flow.
+
+Materials and Labor:
+Item	           Quantity	 Unit Cost   Total Cost
+Asphalt Patching   500 sq ft	 $1.50	    $750
+Crack Filling	   2000 ft	 $0.50	    $1000
+Sealcoating	   10000 sq ft	 $0.20	    $2000
+Line Stripping	   1 lot         $500	    $500
+Total Estimated			            $4250
+
+Payment Terms:
+50% deposit upon signing the contract.
+Balance due upon completion of the work.
+
+Warranty:
+All work will be guaranteed for a period of one year from the date of completion.
+
+Signatures:
+[Client Name] [Date]
+
+[Contractor Name] [Date]
